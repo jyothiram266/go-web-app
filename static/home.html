@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jyothiram's DevOps Portfolio</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .navbar {
+            background: #4a00e0;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.2rem;
+            margin: 0 1rem;
+            padding: 0.5rem;
+            border-radius: 5px;
+        }
+
+        .navbar a:hover {
+            background: #8e2de2;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a00e0, #8e2de2);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin: 0;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: #162447;
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        h2 {
+            color: #e94560;
+            border-bottom: 2px solid #e94560;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        p {
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .about-me {
+            margin-bottom: 2rem;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .skill {
+            background: linear-gradient(145deg, #e94560, #f7a6a6);
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            color: #fff;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .skill:hover {
+            background: linear-gradient(145deg, #f7a6a6, #e94560);
+            transform: translateY(-5px);
+        }
+
+        .projects {
+            margin-bottom: 2rem;
+        }
+
+        .projects p {
+            margin: 1rem 0;
+        }
+
+        .projects p strong {
+            color: #e94560;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            background: #0f3460;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            color: #fff;
+        }
+
+        a {
+            color: #e94560;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="/home">Home</a>
+        <a href="/about">About Me</a>
+        <a href="/contact">Contact</a>
+    </div>
+
+    <div class="header">
+        <h1>Jyothiram's DevOps Portfolio</h1>
+    </div>
+
+    <div class="container">
+        <div class="about-me">
+            <img src="profile-pic.jpg" alt="Jyothiram's Profile Picture" class="profile-pic">
+            <h2>About Me</h2>
+            <p>
+                Hello! I'm Jyothiram, a passionate DevOps engineer with extensive experience in Linux system administration, Kubernetes, and CI/CD pipelines.
+                I thrive on automating processes and creating efficient, scalable deployment solutions. I'm always eager to learn new technologies and take on
+                challenging projects. Let's build something great together!
+            </p>
+            <div class="clear"></div>
+        </div>
+
+        <div class="skills">
+            <h2>Skills</h2>
+            <div class="skill">Linux System Administration</div>
+            <div class="skill">Kubernetes</div>
+            <div class="skill">CI/CD Pipelines</div>
+            <div class="skill">Docker</div>
+            <div class="skill">Terraform</div>
+            <div class="skill">AWS</div>
+            <div class="skill">Ansible</div>
+        </div>
+
+        <div class="projects">
+            <h2>Projects</h2>
+            <p><strong>Automated CI/CD Pipeline:</strong> Implemented a Jenkins pipeline to automate EKS cluster creation and Nginx deployment, integrating Terraform and Kubernetes, enhancing development efficiency.</p>
+            <p><strong>EKS Cluster Deployment:</strong> Developed and applied Terraform configurations to deploy a secure EKS cluster in a private subnet.</p>
+            <p><strong>NGinx Application on EKS:</strong> Deployed an Nginx application to the EKS cluster using Kubernetes manifests for high availability.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2024 Jyothiram. All rights reserved.</p>
+    </div>
+
+</body>
+</html>
