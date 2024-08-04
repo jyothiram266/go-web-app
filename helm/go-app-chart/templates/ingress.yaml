@@ -10,10 +10,10 @@ spec:
   - host: go-web.local
     http:
       paths: 
-      - path: /home
+      - path: /
         pathType: Prefix
         backend:
           service:
             name: go-app-service
             port:
-              number: 30007
+              number: 8080
