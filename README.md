@@ -1,7 +1,7 @@
 # 
 ### Overview
 This project demonstrates the deployment of a scalable Go application using Docker, Kubernetes, Helm, ArgoCD, and GitHub Actions.
-
+![1](https://raw.githubusercontent.com/jyothiram266/go-web-app/master/screenshots/Screenshot%20from%202024-08-08%2018-58-01.png)
 ### Features
 - Optimized Containerization: Utilizes Docker multi-stage builds to reduce image size and enhance deployment efficiency.
 - Kubernetes Deployment: Manages the application on AWS EKS for high availability and scalability.
@@ -76,6 +76,22 @@ By following these steps, you ensure that your Docker image is as small and opti
 ```bash
 docker build -t jyothiram266/go-app .
 ```
+# Install EKS
+
+Please follow the prerequisites doc before this.
+
+## Install a EKS cluster with EKSCTL
+
+```
+eksctl create cluster --name demo-cluster --region us-east-1 
+```
+![2](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2012-11-24.png?raw=true)
+## Delete the cluster
+
+```
+eksctl delete cluster --name demo-cluster --region us-east-1
+```
+
 # Go App Deployment on Kubernetes
 
 This document provides the steps to deploy the Go App on a Kubernetes cluster.
@@ -149,6 +165,14 @@ spec:
             port:
               number: 8080
 ```
+# Install Nginx Ingress Controller on AWS
+
+## Step 1: Deploy the below manifest
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.1/deploy/static/provider/aws/deploy.yaml
+```
+![6](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2012-59-32.png?raw=true)
 Applying the Manifests
 To apply the above manifests, save each to a separate file (deployment.yaml, service.yaml, ingress.yaml) and run the following commands:
 
@@ -157,15 +181,16 @@ kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 kubectl apply -f ingress.yaml
 ```
-Verifying the Deployment
+![3](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2012-32-29.png?raw=true)
+
 After applying the manifests, you can verify the deployment and services with the following commands:
 
 ```sh
-kubectl get deployments
-kubectl get services
+kubectl get all
 kubectl get ingress
 ```
 This should show the go-app deployment running, the go-app-service service, and the go-app ingress.
+![5](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2014-29-49.png?raw=true)
 
 Accessing the Application
 To access the application, you need to configure your local DNS to resolve go-web.local to the Ingress controller's public IP. You can find the public IP address of the Ingress controller with:
@@ -173,12 +198,19 @@ To access the application, you need to configure your local DNS to resolve go-we
 ```sh
 kubectl get services -o wide -w -n ingress-nginx
 ```
-Find the external IP address for the ingress-nginx-controller service and add an entry to your /etc/hosts file (or the equivalent on your operating system):
+![4](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2012-32-42.png?raw=true)
 
+Find the external IP address for the ingress-nginx-controller service and add an entry to your /etc/hosts file (or the equivalent on your operating system):
 ```sh
 <external-ip-address> go-web.local
 ```
+![7](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2014-41-38.png?raw=true)
+
 Then, you should be able to access your Go App by navigating to http://go-web.local in your web browser.
+
+![8](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2013-17-12.png?raw=true)
+![9](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2013-17-17.png)
+![10](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2013-17-22.png)
 
 Sure, let's start from the very beginning and include the command to create a Helm chart using `helm create`.
 
@@ -188,27 +220,26 @@ Sure, let's start from the very beginning and include the command to create a He
 
    Use the `helm create` command to scaffold a new Helm chart:
    ```sh
-   helm create go-app
+   helm create go-app-chart
    ```
 
-   This command creates a directory named `go-app` with a default Helm chart structure.
+![11](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2014-18-17.png?raw=true)
+
+
+This command creates a directory named `go-app-chart` with a default Helm chart structure.
 
 2\. **Update the Helm chart:**
 
-   Replace the default files with your specific configuration.
-
+   Replace the default files with your specific configuration
    Directory Structure
-
-   Ensure your directory structure looks like this:
-
+   Ensure your directory structure looks like this:
+   ![12](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-08%2008-36-41.png?raw=true)
    
-   
-  
 
 3\. **Modify `Chart.yaml`:**
 
    Edit the `Chart.yaml` file with the following content:
-
+    
     apiVersion: v2
     name: go-app-chart
     description: A Helm chart for Kubernetes
@@ -238,9 +269,7 @@ Sure, let's start from the very beginning and include the command to create a He
 
    Update the `values.yaml` file with the following content:
 
-   ```
-     
-      replicaCount: 1
+     replicaCount: 1
       image:
         repository: jyothiram266/go-app
         pullPolicy: IfNotPresent
@@ -258,7 +287,6 @@ Sure, let's start from the very beginning and include the command to create a He
             paths:
               - path: /
                 pathType: ImplementationSpecific
-   ```
 
 5\. **Modify `templates/deployment.yaml`:**
 
@@ -292,8 +320,7 @@ Sure, let's start from the very beginning and include the command to create a He
 6\. **Modify `templates/service.yaml`:**
 
    Update the `templates/service.yaml` file with the following content:
-
-   ```yaml
+    
     apiVersion: v1
     kind: Service
     metadata:
@@ -307,50 +334,48 @@ Sure, let's start from the very beginning and include the command to create a He
           port: 8080         # Port that the service will expose
           targetPort: 8080   # Port on the container that the service should forward traffic to
           nodePort: 30007  
-       ```
-
+   
 7\. **Modify `templates/ingress.yaml`:**
 
    Update the `templates/ingress.yaml` file with the following content:
 
-   ```yaml
-        apiVersion: networking.k8s.io/v1
-        kind: Ingress
-        metadata:
-          name: go-app
-          annotations:
-            nginx.ingress.kubernetes.io/rewrite-target: /
-        spec:
-          ingressClassName: nginx
-          rules:
-          - host: go-web.local
-            http:
-              paths: 
-              - path: /
-                pathType: Prefix
-                backend:
-                  service:
-                    name: go-app-service
-                    port:
-                      number: 8080
-   ```
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: go-app
+      annotations:
+        nginx.ingress.kubernetes.io/rewrite-target: /
+    spec:
+      ingressClassName: nginx
+      rules:
+      - host: go-web.local
+        http:
+          paths: 
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: go-app-service
+                port:
+                  number: 8080
+   
 
 8\. **Package the Helm chart:**
 
    Package your Helm chart into a tar.gz file:
-
-   ```sh
-   helm package go-app
-   ```
+   
+   ```helm package go-app ```
 
 9\. **Install the Helm chart:**
 
    Install the chart to your Kubernetes cluster:
-
+   ```
    helm install my-go-app go-app-0.1.0.tgz
    ```
 
    Replace `my-go-app` with your desired release name.
+
+   ![13](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2014-28-29.png?raw=true)
 
 10\. **Verify the deployment:**
 
@@ -556,36 +581,82 @@ To modify the workflow:
 
 This workflow ensures a continuous integration and deployment process, allowing for automated builds, tests, and deployments to the Kubernetes cluster.
 
+### Argo CD Overview
 
-Helm Installation:
+**Argo CD** is a declarative, GitOps continuous delivery tool for Kubernetes. It continuously monitors the Git repository where your Kubernetes manifests (including Helm charts) are stored and automatically syncs them to your Kubernetes cluster, ensuring that the cluster state matches the desired state as defined in your repository.
 
-helm install your-release-name ./helm-chart-directory
-Apply Kubernetes Manifests:
-bash
-Copy code
-kubectl apply -f ./k8s
-Set Up ArgoCD for Continuous Deployment:
+### Workflow Overview
 
-Install ArgoCD:
-bash
-Copy code
-kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-Connect Your Repository:
-Follow ArgoCD documentation to connect your GitHub repository.
-Configure GitHub Actions:
+1.  **Build and Test Job (GitHub Actions)**
+    
+    *   **Purpose:** Build and test the Go application.
+        
+    *   **Steps:**
+        
+        *   Build the Go application.
+            
+        *   Run tests to ensure the application works as expected.
+            
+2.  **Push Docker Image Job (GitHub Actions)**
+    
+    *   **Purpose:** Build and push the Docker image to DockerHub.
+        
+    *   **Steps:**
+        
+        *   Build the Docker image using the Dockerfile.
+            
+        *   Push the image to DockerHub with a unique tag.
+            
+3.  **Update Helm Chart Job (GitHub Actions)**
+    
+    *   **Purpose:** Update the image tag in the Helm chart and commit the changes to the repository.
+        
+    *   **Steps:**
+        
+        *   Update the image tag in the values.yaml file.
+            
+        *   Commit and push the changes to the repository.
+            
+4.  **Continuous Deployment with Argo CD**
+    
+    *   **Purpose:** Automatically deploy the updated application to the Kubernetes cluster.
+        
+    *   **How It Works:**
+        
+        *   Argo CD is configured to monitor the Git repository where your Helm charts are stored.
+            
+        *   Whenever a new commit is detected in the main branch (containing updated Kubernetes manifests or Helm charts), Argo CD automatically syncs the changes to the Kubernetes cluster.
+            
+        *   Argo CD ensures that the cluster state always matches the desired state defined in the repository, making deployments predictable and repeatable.
+            
 
-Ensure your repository has the necessary GitHub Actions workflows in .github/workflows.
-Usage
-Access the Application:
+### Setting Up Argo CD
 
-Find the Nginx Ingress Controller IP:
-bash
-Copy code
-kubectl get ingress
-Open the IP address in your browser.
-Monitor Deployment:
+To set up Argo CD for this project:
 
-Use ArgoCD UI or CLI to monitor and manage deployments.
-Contributing
+1.  **Install Argo CD:**
+    
+    *   Follow the [Argo CD installation guide](https://github.com/jyothiram266/go-web-app/blob/master/argocd/01-install.md) to install Argo CD in your Kubernetes cluster.
+      ![17](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2014-44-22.png?raw=true)
+        
+2. **Deploy via Argo CD:**
+    ![18](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2014-46-15.png?raw=true)
+    *   Argo CD will automatically deploy the latest version of your application whenever changes are detected in the repository.
+        
+
+### Benefits of Using Argo CD
+
+*   **GitOps:** The entire deployment process is driven by Git, providing a clear history of changes.
+    
+*   **Automation:** Deployment is fully automated, reducing manual intervention.
+    
+*   **Declarative Approach:** The desired state of your application is declared in Git, and Argo CD ensures the actual state matches it.
+    
+*   **Rollback:** Easily revert to previous versions by syncing to a previous Git commit.
+    
+
+By combining GitHub Actions for CI and Argo CD for CD, you achieve a fully automated and reliable pipeline for delivering your application to production.
+
+
+### Contributing
 Feel free to open issues or submit pull requests for any enhancements or bug fixes.
