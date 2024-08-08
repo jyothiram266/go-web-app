@@ -238,10 +238,9 @@ Sure, let's start from the very beginning and include the command to create a He
 
    Update the `values.yaml` file with the following content:
 
-   ```yaml 
-       
+   ```
+     
       replicaCount: 1
-      
       image:
         repository: jyothiram266/go-app
         pullPolicy: IfNotPresent
@@ -265,8 +264,7 @@ Sure, let's start from the very beginning and include the command to create a He
 
    Update the `templates/deployment.yaml` file with the following content:
 
-   ```yaml
-
+```
       # This is a sample deployment manifest file for a simple web application.
     apiVersion: apps/v1
     kind: Deployment
@@ -289,7 +287,7 @@ Sure, let's start from the very beginning and include the command to create a He
             image: jyothiram266/go-app:{{ .Values.image.tag }}
             ports:
             - containerPort: 8080
-   ```
+```
 
 6\. **Modify `templates/service.yaml`:**
 
@@ -316,25 +314,25 @@ Sure, let's start from the very beginning and include the command to create a He
    Update the `templates/ingress.yaml` file with the following content:
 
    ```yaml
-  apiVersion: networking.k8s.io/v1
-  kind: Ingress
-  metadata:
-    name: go-app
-    annotations:
-      nginx.ingress.kubernetes.io/rewrite-target: /
-  spec:
-    ingressClassName: nginx
-    rules:
-    - host: go-web.local
-      http:
-        paths: 
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: go-app-service
-              port:
-                number: 8080
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        metadata:
+          name: go-app
+          annotations:
+            nginx.ingress.kubernetes.io/rewrite-target: /
+        spec:
+          ingressClassName: nginx
+          rules:
+          - host: go-web.local
+            http:
+              paths: 
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: go-app-service
+                    port:
+                      number: 8080
    ```
 
 8\. **Package the Helm chart:**
