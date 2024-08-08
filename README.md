@@ -642,7 +642,7 @@ To set up Argo CD for this project:
 2. **Deploy via Argo CD:**
     ![18](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2014-46-15.png?raw=true)
     *   Argo CD will automatically deploy the latest version of your application whenever changes are detected in the repository.
-        
+    ![19](https://github.com/jyothiram266/go-web-app/blob/master/screenshots/Screenshot%20from%202024-08-04%2014-58-40.png?raw=true)       
 
 ### Benefits of Using Argo CD
 
