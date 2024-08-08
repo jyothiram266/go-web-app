@@ -366,6 +366,199 @@ Sure, let's start from the very beginning and include the command to create a He
 
 This process will allow you to create and deploy your application using Helm, with configurable parameters in the `values.yaml` file. Adjust any configurations as needed for your specific use case.
 
+CI/CD Pipeline
+--------------
+
+This project uses GitHub Actions to automate the build, test, and deployment processes. The workflow is defined in .github/workflows/deploy.yml and is triggered on every push to the main branch. Below is an explanation of each job in the workflow:
+
+```yaml
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'helm/**'
+      - 'k8s/**'
+      - 'README.md'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Go 1.22
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.22
+
+    - name: Build
+      run: go build -o go-web-app
+
+    - name: Test
+      run: go test ./...
+  
+  code-quality:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: v1.56.2
+  
+  push:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build and Push action
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/go-app:${{github.run_id}}
+
+  update-newtag-in-helm-chart:
+    runs-on: ubuntu-latest
+
+    needs: push
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.TOKEN }}
+
+    - name: Update tag in Helm chart
+      run: |
+        sed -i 's/tag: .*/tag: "${{github.run_id}}"/' helm/go-web-chart/values.yaml
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.email "jyothiram266@gmail.com"
+        git config --global user.name "jyothiram266"
+        git add helm/go-app-chart/values.yaml
+        git commit -m "Update tag in Helm chart"
+        git push
+```
+
+### Workflow Overview
+
+1.  **Build Job**
+    
+    *   **Purpose:** Build and test the Go application.
+        
+    *   **Steps:**
+        
+        *   **Checkout repository:** Fetches the code from the repository.
+            
+        *   **Set up Go:** Configures the environment with Go 1.22.
+            
+        *   **Build:** Compiles the Go application into a binary.
+            
+        *   **Test:** Runs tests on the codebase to ensure functionality.
+            
+2.  **Code Quality Job**
+    
+    *   **Purpose:** Analyze code quality using linting tools.
+        
+    *   **Steps:**
+        
+        *   **Checkout repository:** Fetches the code from the repository.
+            
+        *   **Run golangci-lint:** Executes golangci-lint to check for code quality issues.
+            
+3.  **Push Job**
+    
+    *   **Purpose:** Build and push the Docker image to DockerHub.
+        
+    *   **Steps:**
+        
+        *   **Checkout repository:** Fetches the code from the repository.
+            
+        *   **Set up Docker Buildx:** Configures Docker Buildx for multi-platform builds.
+            
+        *   **Login to DockerHub:** Authenticates with DockerHub using credentials stored in GitHub Secrets.
+            
+        *   **Build and Push:** Builds the Docker image using the Dockerfile and pushes it to DockerHub with a unique tag based on the GitHub run ID.
+            
+4.  **Update Tag in Helm Chart Job**
+    
+    *   **Purpose:** Update the image tag in the Helm chart and commit the changes.
+        
+    *   **Steps:**
+        
+        *   **Checkout repository:** Fetches the code from the repository.
+            
+        *   **Update tag in Helm chart:** Updates the Docker image tag in the values.yaml file of the Helm chart.
+            
+        *   **Commit and push changes:** Commits the updated Helm chart and pushes the changes to the repository.
+            
+5.  **Deploy Job**
+    
+    *   **Purpose:** Deploy the updated Helm chart to the EKS cluster.
+        
+    *   **Steps:**
+        
+        *   **Checkout repository:** Fetches the code from the repository.
+            
+        *   **Set up Helm:** Configures Helm for deploying the chart.
+            
+        *   **Set up Kubernetes:** Configures kubectl to interact with the Kubernetes cluster.
+            
+        *   **Configure kubectl:** Sets up kubectl with the Kubernetes credentials stored in GitHub Secrets.
+            
+        *   **Deploy Helm chart:** Uses Helm to upgrade or install the application in the Kubernetes cluster.
+            
+
+### Secrets
+
+To ensure the workflow functions correctly, the following secrets must be set in the GitHub repository:
+
+*   **DOCKERHUB\_USERNAME:** Your DockerHub username.
+    
+*   **DOCKERHUB\_TOKEN:** Your DockerHub access token.
+    
+*   **TOKEN:** GitHub token for committing changes.
+    
+*   **KUBECONFIG:** Kubernetes configuration file content or base64 encoded kubeconfig.
+    
+
+### How to Modify
+
+To modify the workflow:
+
+1.  **Update the Docker image or tag:** Change the Dockerfile or values.yaml in the Helm chart.
+    
+2.  **Update Helm chart parameters:** Modify the Helm chart's values.yaml to match your deployment needs.
+    
+3.  **Change Kubernetes or DockerHub credentials:** Update the GitHub repository secrets if credentials change.
+    
+
+This workflow ensures a continuous integration and deployment process, allowing for automated builds, tests, and deployments to the Kubernetes cluster.
+
+
 Helm Installation:
 
 helm install your-release-name ./helm-chart-directory
